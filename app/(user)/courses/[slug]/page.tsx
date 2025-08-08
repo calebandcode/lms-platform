@@ -35,7 +35,7 @@ interface Course {
 }
 
 interface CoursePageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
