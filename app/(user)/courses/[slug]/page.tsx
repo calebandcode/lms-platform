@@ -7,15 +7,40 @@ import getCourseBySlug from "@/sanity/lib/courses/getCourseBySlug";
 import { isEnrolledInCourse } from "@/sanity/lib/student/isEnrolledInCourse";
 import { auth } from "@clerk/nextjs/server";
 
+interface Lesson {
+  _id: string;
+  title: string;
+}
+
+interface Module {
+  _id: string;
+  title: string;
+  lessons?: Lesson[];
+}
+
+interface Course {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  slug: { current: string };
+  image?: any;
+  category?: { name: string };
+  modules?: Module[];
+  instructor?: {
+    name: string;
+    photo?: any;
+    bio?: string;
+  };
+}
+
 interface CoursePageProps {
-  params: Promise<{
-    slug: string;
-  }>;
+  params: { slug: string };
 }
 
 export default async function CoursePage({ params }: CoursePageProps) {
   const { slug } = await params;
-  const course = await getCourseBySlug(slug);
+  const course = (await getCourseBySlug(slug)) as Course | null;
   const { userId } = await auth();
 
   const isEnrolled =
@@ -37,8 +62,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <div className="relative h-[60vh] w-full">
         {course.image && (
           <Image
-            src={urlFor(course.image).url() || ""}
-            alt={course.title || "Course Title"}
+            src={urlFor(course.image).url()!}
+            alt={course.title}
             fill
             className="object-cover"
             priority
@@ -86,7 +111,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <div className="bg-card rounded-lg p-6 mb-8 border border-border">
               <h2 className="text-2xl font-bold mb-4">Course Content</h2>
               <div className="space-y-4">
-                {course.modules?.map((module: any, index: number) => (
+                {course.modules?.map((module, index) => (
                   <div
                     key={module._id}
                     className="border border-border rounded-lg"
@@ -97,7 +122,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                       </h3>
                     </div>
                     <div className="divide-y divide-border">
-                      {module.lessons?.map((lesson: any, lessonIndex: number) => (
+                      {module.lessons?.map((lesson, lessonIndex) => (
                         <div
                           key={lesson._id}
                           className="p-4 hover:bg-muted/50 transition-colors"
@@ -132,8 +157,8 @@ export default async function CoursePage({ params }: CoursePageProps) {
                     {course.instructor.photo && (
                       <div className="relative h-12 w-12">
                         <Image
-                          src={urlFor(course.instructor.photo).url() || ""}
-                          alt={course.instructor.name || "Course Instructor"}
+                          src={urlFor(course.instructor.photo).url()!}
+                          alt={course.instructor.name}
                           fill
                           className="rounded-full object-cover"
                         />
