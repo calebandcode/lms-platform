@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getStudentByClerkId } from "@/sanity/lib/student/getStudentByClerkId";
@@ -6,15 +5,29 @@ import { createEnrollment } from "@/sanity/lib/student/createEnrollment";
 
 const PAYSTACK_WEBHOOK_SECRET = process.env.PAYSTACK_WEBHOOK_SECRET!;
 
+interface PaystackChargeData {
+  metadata?: {
+    courseId?: string;
+    userId?: string;
+  };
+  amount: number;
+  reference: string;
+}
+
+interface PaystackWebhookEvent {
+  event: string;
+  data: PaystackChargeData;
+}
+
 export async function POST(req: Request) {
   // 1. Read raw body & signature header
   const body = await req.text();
-  const sig = headers().get("x-paystack-signature");
+  const sig = req.headers.get("x-paystack-signature");
   if (!sig) {
     return new NextResponse("No signature provided", { status: 400 });
   }
 
-  // 2. Verify signature
+  // 2. Verify HMAC-SHA512
   const hash = crypto
     .createHmac("sha512", PAYSTACK_WEBHOOK_SECRET)
     .update(body, "utf8")
@@ -24,44 +37,41 @@ export async function POST(req: Request) {
     return new NextResponse("Invalid signature", { status: 400 });
   }
 
-  // 3. Parse the event
-  let evt: any;
+  // 3. Parse & type-cast
+  let evt: PaystackWebhookEvent;
   try {
-    evt = JSON.parse(body);
+    evt = JSON.parse(body) as PaystackWebhookEvent;
   } catch {
     return new NextResponse("Invalid JSON", { status: 400 });
   }
 
-  // 4. Only handle successful charges
+  // 4. Handle only successful charges
   if (evt.event === "charge.success") {
-    const data = evt.data;
-    const metadata = data.metadata || {};
-    const courseId = metadata.courseId;
-    const userId = metadata.userId;
+    const { data } = evt;
+    const { metadata = {} } = data;
+    const { courseId, userId } = metadata;
 
     if (!courseId || !userId) {
-      return new NextResponse("Missing metadata (courseId or userId)", { status: 400 });
+      return new NextResponse("Missing metadata", { status: 400 });
     }
 
-    // 5. Lookup student and create enrollment
+    // 5. Lookup student & enroll
     const student = await getStudentByClerkId(userId);
     if (!student.data) {
       return new NextResponse("Student not found", { status: 404 });
     }
 
-    // amount is in kobo; convert to Naira
     const amountNaira = data.amount / 100;
-
     await createEnrollment({
       studentId: student.data._id,
       courseId,
-      paymentId: data.reference,       // paystack transaction reference
+      paymentId: data.reference,
       amount: amountNaira,
     });
 
     return new NextResponse(null, { status: 200 });
   }
 
-  // 5b. Return 200 for all other events
+  // 6. Acknowledge all other events
   return new NextResponse(null, { status: 200 });
 }
