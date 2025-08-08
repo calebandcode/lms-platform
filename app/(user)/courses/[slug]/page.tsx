@@ -86,7 +86,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
             <div className="bg-card rounded-lg p-6 mb-8 border border-border">
               <h2 className="text-2xl font-bold mb-4">Course Content</h2>
               <div className="space-y-4">
-                {course.modules?.map((module, index) => (
+                {course.modules?.map((module: any, index: number) => (
                   <div
                     key={module._id}
                     className="border border-border rounded-lg"
@@ -97,7 +97,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                       </h3>
                     </div>
                     <div className="divide-y divide-border">
-                      {module.lessons?.map((lesson, lessonIndex) => (
+                      {module.lessons?.map((lesson: any, lessonIndex: number) => (
                         <div
                           key={lesson._id}
                           className="p-4 hover:bg-muted/50 transition-colors"
