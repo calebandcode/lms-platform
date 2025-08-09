@@ -7,6 +7,12 @@ import getCourseBySlug from "@/sanity/lib/courses/getCourseBySlug";
 import { isEnrolledInCourse } from "@/sanity/lib/student/isEnrolledInCourse";
 import { auth } from "@clerk/nextjs/server";
 
+// Minimal Sanity image type for strong typing (no 'any')
+type MinimalSanityImage = {
+  _type: "image";
+  asset?: { _type: "reference"; _ref: string };
+};
+
 interface Lesson {
   _id: string;
   title: string;
@@ -24,22 +30,21 @@ interface Course {
   description: string;
   price: number;
   slug: { current: string };
-  image?: any;
+  image?: MinimalSanityImage;
   category?: { name: string };
   modules?: Module[];
   instructor?: {
     name: string;
-    photo?: any;
+    photo?: MinimalSanityImage;
     bio?: string;
   };
 }
 
 interface CoursePageProps {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 }
 
-export default async function CoursePage({ params }: CoursePageProps) {
-  const { slug } = await params;
+export default async function CoursePage({ params: { slug } }: CoursePageProps) {
   const course = (await getCourseBySlug(slug)) as Course | null;
   const { userId } = await auth();
 
@@ -62,7 +67,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
       <div className="relative h-[60vh] w-full">
         {course.image && (
           <Image
-            src={urlFor(course.image).url()!}
+            src={urlFor(course.image).url() ?? ""}
             alt={course.title}
             fill
             className="object-cover"
@@ -157,7 +162,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
                     {course.instructor.photo && (
                       <div className="relative h-12 w-12">
                         <Image
-                          src={urlFor(course.instructor.photo).url()!}
+                          src={urlFor(course.instructor.photo).url() ?? ""}
                           alt={course.instructor.name}
                           fill
                           className="rounded-full object-cover"
