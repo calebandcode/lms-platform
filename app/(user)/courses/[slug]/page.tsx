@@ -7,7 +7,7 @@ import getCourseBySlug from "@/sanity/lib/courses/getCourseBySlug";
 import { isEnrolledInCourse } from "@/sanity/lib/student/isEnrolledInCourse";
 import { auth } from "@clerk/nextjs/server";
 
-// Minimal Sanity image type for strong typing (no 'any')
+// Minimal Sanity image type (avoids `any`)
 type MinimalSanityImage = {
   _type: "image";
   asset?: { _type: "reference"; _ref: string };
@@ -40,11 +40,15 @@ interface Course {
   };
 }
 
+// Next.js 15 passes `params` as a Promise in pages/layouts.
+//    Await it before using `slug` to satisfy prod builds on Vercel.
 interface CoursePageProps {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
-export default async function CoursePage({ params: { slug } }: CoursePageProps) {
+export default async function CoursePage(props: CoursePageProps) {
+  const { slug } = await props.params;
+
   const course = (await getCourseBySlug(slug)) as Course | null;
   const { userId } = await auth();
 
