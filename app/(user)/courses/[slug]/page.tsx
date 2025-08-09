@@ -40,7 +40,7 @@ interface Course {
   };
 }
 
-// Next.js 15 passes `params` as a Promise in pages/layouts.
+// ✅ Next.js 15 passes `params` as a Promise in pages/layouts.
 //    Await it before using `slug` to satisfy prod builds on Vercel.
 interface CoursePageProps {
   params: Promise<{ slug: string }>;
