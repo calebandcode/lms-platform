@@ -1,12 +1,28 @@
 import Hero from "@/components/Hero";
 import { CourseCard } from "@/components/CourseCard";
 import { getCourses } from "@/sanity/lib/courses/getCourses";
+import type { ComponentProps } from "react";
 
 export const dynamic = "force-static";
 export const revalidate = 3600; // revalidate at most every hour
 
+// exact course type from CourseCard
+type CourseCardProps = ComponentProps<typeof CourseCard>;
+type CourseForCard = NonNullable<CourseCardProps["course"]>;
+
+// Safe normalizer: supports string | {current?: string} | null/undefined
+function toSlug(s: unknown): string {
+  if (typeof s === "string") return s;
+  if (s && typeof s === "object" && "current" in s) {
+    const cur = (s as { current?: unknown }).current;
+    return typeof cur === "string" ? cur : "";
+  }
+  return "";
+}
+
 export default async function Home() {
-  const courses = await getCourses();
+  // Avoid implicit any by typing the array to what CourseCard expects
+  const courses = (await getCourses()) as CourseForCard[];
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,11 +39,11 @@ export default async function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16">
-          {courses.map((course) => (
+          {courses.map((course: CourseForCard) => (
             <CourseCard
               key={course._id}
               course={course}
-              href={`/courses/${course.slug}`}
+              href={`/courses/${toSlug(course.slug)}`}
             />
           ))}
         </div>
