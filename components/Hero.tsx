@@ -7,8 +7,8 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
 
       <div className="relative container mx-auto px-4 md:px-24 h-full w-full flex flex-col justify-center">
-        <div className="max-w-3xl">
-          <h1 className="text-5xl md:text-6xl font-bold mt-16 tracking-wider mb-8 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
+        <div className="max-w-4xl">
+          <h1 className="text-4xl md:text-6xl font-bold mt-16 tracking-wider mb-8 bg-gradient-to-r from-foreground to-foreground/80 bg-clip-text text-transparent">
               Skills that power careers
           </h1>
           <p className="text-xl text-muted-foreground/90 mb-5">
