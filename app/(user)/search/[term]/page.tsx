@@ -1,17 +1,19 @@
 import { Search } from "lucide-react";
 import { CourseCard } from "@/components/CourseCard";
 import { searchCourses } from "@/sanity/lib/courses/searchCourses";
+import type { ComponentProps } from "react";
+
+// Derive the exact Course shape from CourseCard props
+type Course = NonNullable<ComponentProps<typeof CourseCard>["course"]>;
 
 interface SearchPageProps {
-  params: Promise<{
-    term: string;
-  }>;
+  params: { term: string }; // not a Promise
 }
 
 export default async function SearchPage({ params }: SearchPageProps) {
-  const { term } = await params;
-  const decodedTerm = decodeURIComponent(term);
-  const courses = await searchCourses(decodedTerm);
+  const decodedTerm = decodeURIComponent(params.term);
+  const courses = (await searchCourses(decodedTerm)) as Course[]; 
+  // (Even better: type searchCourses to return Promise<Course[]>)
 
   return (
     <div className="h-full pt-16">
@@ -36,7 +38,7 @@ export default async function SearchPage({ params }: SearchPageProps) {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {courses.map((course) => (
+            {courses.map((course: Course) => (
               <CourseCard
                 key={course._id}
                 course={course}
