@@ -4,31 +4,18 @@ import { getCourses } from "@/sanity/lib/courses/getCourses";
 import type { ComponentProps } from "react";
 
 export const dynamic = "force-static";
-export const revalidate = 3600; // revalidate at most every hour
+export const revalidate = 3600;
 
-// exact course type from CourseCard
-type CourseCardProps = ComponentProps<typeof CourseCard>;
-type CourseForCard = NonNullable<CourseCardProps["course"]>;
-
-// Safe normalizer: supports string | {current?: string} | null/undefined
-function toSlug(s: unknown): string {
-  if (typeof s === "string") return s;
-  if (s && typeof s === "object" && "current" in s) {
-    const cur = (s as { current?: unknown }).current;
-    return typeof cur === "string" ? cur : "";
-  }
-  return "";
-}
+// derive the exact Course shape from CourseCard
+type Course = NonNullable<ComponentProps<typeof CourseCard>["course"]>;
 
 export default async function Home() {
-  // Avoid implicit any by typing the array to what CourseCard expects
-  const courses = (await getCourses()) as CourseForCard[];
+  const courses = (await getCourses()) as Course[]; // or type getCourses to return Promise<Course[]>
 
   return (
     <div className="min-h-screen bg-background">
       <Hero />
 
-      {/* Courses Grid */}
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-4 py-8">
           <div className="h-px flex-1 bg-gradient-to-r from-border/0 via-border to-border/0" />
@@ -39,11 +26,11 @@ export default async function Home() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-16">
-          {courses.map((course: CourseForCard) => (
+          {courses.map((course: Course) => (
             <CourseCard
               key={course._id}
               course={course}
-              href={`/courses/${toSlug(course.slug)}`}
+              href={`/courses/${course.slug}`}
             />
           ))}
         </div>
