@@ -1,10 +1,18 @@
 import { defineQuery } from "groq";
 import { sanityFetch } from "../live";
 
-export async function getLessonCompletions(
-  studentId: string,
-  courseId: string
-) {
+// minimal shapes you actually use
+type Lesson = { _id: string };
+type Module = { _id: string; title?: string; lessons?: Lesson[] };
+type Course = { _id: string; modules?: Module[] };
+type LessonCompletion = { module?: { _id?: string }; lesson?: { _id?: string } };
+
+type Payload = {
+  completedLessons?: LessonCompletion[];
+  course?: Course | null;
+};
+
+export async function getLessonCompletions(studentId: string, courseId: string) {
   const getCompletionsQuery = defineQuery(`{
     "completedLessons": *[_type == "lessonCompletion" && student._ref == $studentId && course._ref == $courseId] {
       ...,
@@ -25,38 +33,38 @@ export async function getLessonCompletions(
     params: { studentId, courseId },
   });
 
-  const { course, completedLessons } = result.data;
+  const { course, completedLessons = [] } = (result.data ?? {}) as Payload;
 
   // Calculate module progress
-  const moduleProgress = course?.modules?.map((module) => {
-    const totalLessons = module.lessons?.length || 0;
-    const completedInModule = completedLessons.filter(
-      (completion) => completion.module?._id === module._id
-    ).length;
+  const moduleProgress =
+    course?.modules?.map((mod: Module) => {
+      const totalLessons = mod.lessons?.length ?? 0;
+      const completedInModule = completedLessons.filter(
+        (c: LessonCompletion) => c.module?._id === mod._id
+      ).length;
 
-    return {
-      moduleId: module._id,
-      title: module.title,
-      progress: totalLessons > 0 ? (completedInModule / totalLessons) * 100 : 0,
-      completedLessons: completedInModule,
-      totalLessons,
-    };
-  });
+      return {
+        moduleId: mod._id,
+        title: mod.title,
+        progress: totalLessons > 0 ? (completedInModule / totalLessons) * 100 : 0,
+        completedLessons: completedInModule,
+        totalLessons,
+      };
+    }) ?? [];
 
   // Calculate overall course progress
   const totalLessons =
     course?.modules?.reduce(
-      (acc, module) => acc + (module?.lessons?.length || 0),
+      (acc: number, mod: Module) => acc + (mod.lessons?.length ?? 0),
       0
-    ) || 0;
+    ) ?? 0;
 
-  const totalCompleted = completedLessons?.length || 0;
-  const courseProgress =
-    totalLessons > 0 ? (totalCompleted / totalLessons) * 100 : 0;
+  const totalCompleted = completedLessons.length;
+  const courseProgress = totalLessons > 0 ? (totalCompleted / totalLessons) * 100 : 0;
 
   return {
-    completedLessons: completedLessons || [],
-    moduleProgress: moduleProgress || [],
+    completedLessons,
+    moduleProgress,
     courseProgress,
   };
 }
