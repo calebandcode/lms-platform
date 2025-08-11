@@ -24,7 +24,7 @@ export default async function RootLayout({
     <html lang="en" suppressHydrationWarning>
       
       <body
-        className={`${inter.className} antialiased container`}
+        className={`${inter.className} antialiased`}
       > 
         {(await draftMode()).isEnabled && (
           <>

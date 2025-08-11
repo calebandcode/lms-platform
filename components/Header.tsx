@@ -12,7 +12,7 @@ export default function Header() {
    bg-gradient-to-t from-background via-background/80 to-background/20
     ">
       
-      <div className="container mx-auto px-4 py-1.5">
+      <div className="container mx-auto py-1.5">
         <div className="flex h-16 items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <Link
