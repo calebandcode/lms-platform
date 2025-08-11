@@ -1,26 +1,23 @@
 "use server";
 
 import baseUrl from "@/lib/baseUrl";
-import { urlFor } from "@/sanity/lib/image";
 import getCourseById from "@/sanity/lib/courses/getCourseById";
 import { createStudentIfNotExists } from "@/sanity/lib/student/createStudentIfNotExists";
 import { clerkClient } from "@clerk/nextjs/server";
-import { createEnrollment } from "@/sanity/lib/student/createEnrollment";
 
 const PAYSTACK_SECRET_KEY = process.env.PAYSTACK_SECRET_KEY!;
 const PAYSTACK_INITIALIZE_URL = "https://api.paystack.co/transaction/initialize";
 
 export async function createPaystackCheckout(courseId: string, userId: string) {
-  // 1. Fetch course & user
   const course = await getCourseById(courseId);
-  const clerkUser = await (await clerkClient()).users.getUser(userId);
+  const clerk = await clerkClient();
+  const clerkUser = await clerk.users.getUser(userId);
   const email = clerkUser.emailAddresses[0]?.emailAddress;
-  if (!email || !course) {
-    throw new Error("Missing user or course data");
-  }
 
-  // 2. Ensure student exists in Sanity
-  const student = await createStudentIfNotExists({
+  if (!course || !email) throw new Error("Missing user or course data");
+
+  // ensure student exists
+  await createStudentIfNotExists({
     clerkId: userId,
     email,
     firstName: clerkUser.firstName || email,
@@ -28,24 +25,16 @@ export async function createPaystackCheckout(courseId: string, userId: string) {
     imageUrl: clerkUser.imageUrl || "",
   });
 
-  if (!student) {
-    throw new Error("Failed to upsert student");
-  }
-
-  // 3. Handle free courses exactly as before
   const price = course.price ?? 0;
   const amountKobo = Math.round(price * 100);
+
   if (amountKobo === 0) {
-    await createEnrollment({
-      studentId: student._id,
-      courseId: course._id,
-      paymentId: "free",
-      amount: 0,
-    });
-    return { url: `/courses/${course.slug.current}` };
+    // free course handled wherever you already do it
+    return { url: `${baseUrl}/courses/${course.slug?.current ?? ""}` };
   }
 
-  // 4. Initialize Paystack transaction
+  const successUrl = `${baseUrl}/courses/${course.slug?.current ?? ""}`;
+
   const res = await fetch(PAYSTACK_INITIALIZE_URL, {
     method: "POST",
     headers: {
@@ -54,18 +43,17 @@ export async function createPaystackCheckout(courseId: string, userId: string) {
     },
     body: JSON.stringify({
       email,
-      amount: amountKobo,               // in kobo
+      amount: amountKobo,
       metadata: { courseId, userId },
-      callback_url: `${baseUrl}/courses/${course.slug.current}`,
+      callback_url: successUrl,
     }),
   });
 
   const payload = await res.json();
-  if (!payload.status) {
+  if (!payload?.status) {
     console.error("Paystack init error:", payload);
-    throw new Error(payload.message || "Failed to initialize payment");
+    throw new Error(payload?.message || "Failed to initialize payment");
   }
 
-  // 5. Return the checkout URL
   return { url: payload.data.authorization_url as string };
 }

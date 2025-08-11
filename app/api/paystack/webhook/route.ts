@@ -1,3 +1,7 @@
+export const runtime = "nodejs";       
+export const dynamic = "force-dynamic"; // never cache a webhook route
+
+
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { getStudentByClerkId } from "@/sanity/lib/student/getStudentByClerkId";
