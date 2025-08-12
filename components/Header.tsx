@@ -1,10 +1,15 @@
 "use client";
 
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { BookMarkedIcon, BookAudio } from "lucide-react";
+import { BookMarkedIcon, BookAudio, SearchIcon } from "lucide-react";
 import Link from "next/link";
 import { SearchInput } from "./SearchInput";
 import { Button } from "./ui/button";
+import HamburgerMenu from "./HamburgerMenu";
+
+
+
+
 
 export default function Header() {
   return (
@@ -13,8 +18,8 @@ export default function Header() {
     ">
       
       <div className="container mx-auto py-1.5">
-        <div className="flex h-16 items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex h-16 items-center justify-between gap-4 px-2">
+          {/* <div className="flex items-center gap-4">
             <Link
               href="/"
               prefetch={false}
@@ -39,11 +44,11 @@ export default function Header() {
                 <BookMarkedIcon className="h-4 w-4" />
                 <span className="hidden md:block">My Courses</span>
               </Link>
-            </nav>
+            </nav> */}
 
             {/* <DarkModeToggle /> */}
 
-            <SignedIn>
+            {/* <SignedIn>
               <UserButton />
             </SignedIn>
 
@@ -53,8 +58,16 @@ export default function Header() {
                   Sign In
                 </Button>
               </SignInButton>
-            </SignedOut>
-          </div>
+            </SignedOut> */}
+          {/* </div> */}
+
+          <HamburgerMenu />
+
+          <Link href='/' className="text-xl font-bold">
+          FALU_VIN
+          </Link>
+
+          <SearchIcon />
         </div>
       </div>
     </header>
