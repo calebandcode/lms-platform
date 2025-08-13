@@ -15,7 +15,7 @@ import React from 'react'
 const HamburgerMenu = () => {
   return (
    <Sheet>
-  <SheetTrigger><MenuIcon /></SheetTrigger>
+  <SheetTrigger className="md:hidden"><MenuIcon /></SheetTrigger>
   <SheetContent>
     <SheetHeader>
       <SheetTitle>Are you absolutely sure?</SheetTitle>

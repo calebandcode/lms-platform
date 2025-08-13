@@ -2,6 +2,11 @@ import Hero from "@/components/Hero";
 import { CourseCard } from "@/components/CourseCard";
 import { getCourses } from "@/sanity/lib/courses/getCourses";
 import type { ComponentProps } from "react";
+import SkillsFinder from "@/components/skillFinder";
+import { ValueProps } from "@/components/valueProps";
+import Footer from "@/components/Footer";
+import FaqSection from "@/components/faqSection";
+
 
 export const dynamic = "force-static";
 export const revalidate = 3600;
@@ -15,6 +20,19 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-background">
       <Hero />
+   
+
+  <SkillsFinder
+        searchPath="/search"
+        categories={[
+          "Web Development",
+          "Data Science",
+          "UI/UX Design",
+          "Digital Marketing",
+          "Cybersecurity",
+          "AI & Machine Learning",
+        ]}
+      />
 
       <div className="container mx-auto px-4">
         <div className="flex items-center gap-4 py-8">
@@ -31,10 +49,15 @@ export default async function Home() {
               key={course._id}
               course={course}
               href={`/courses/${course.slug}`}
-            />
-          ))}
+              />
+            ))}
         </div>
       </div>
+
+            <ValueProps />
+       
+<FaqSection />
+      <Footer />
     </div>
   );
 }

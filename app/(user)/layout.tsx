@@ -22,7 +22,7 @@ export default function UserLayout({
         enableSystem
         disableTransitionOnChange
       >
-        <div className="min-h-screen flex flex-col">
+        <div className="min-h-screen flex flex-col" suppressHydrationWarning>
           <Header />
           <main className="flex-1">{children}</main>
         </div>

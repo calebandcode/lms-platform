@@ -1,73 +1,77 @@
 "use client";
 
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { BookMarkedIcon, BookAudio, SearchIcon } from "lucide-react";
 import Link from "next/link";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
+import { SearchIcon } from "lucide-react";
 import { SearchInput } from "./SearchInput";
 import { Button } from "./ui/button";
 import HamburgerMenu from "./HamburgerMenu";
-
-
-
+import { NavMenu } from "./dropDownMenu";
 
 
 export default function Header() {
+ 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-sm border-b border-border mb-6 
-   bg-gradient-to-t from-background via-background/80 to-background/20
-    ">
-      
-      <div className="container mx-auto py-1.5">
-        <div className="flex h-16 items-center justify-between gap-4 px-2">
-          {/* <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              prefetch={false}
-              className="flex items-center space-x-2 hover:opacity-90 transition-opacity"
-            >
-              <BookAudio className="h-6 w-6 text-primary" />
-              <span className="text-xl font-bold bg-gradient-to-r from-primary/90 to-primary bg-clip-text text-transparent">
-                LMS
-              </span>
+    <header
+      className={`fixed top-0 inset-x-0 z-50 border-b border-border
+      backdrop-blur supports-[backdrop-filter]:bg-background/60 bg-background/80 `}
+    >
+      <div className="container mx-auto">
+        <div className="flex h-16 items-center justify-between gap-4 px-3 md:px-6">
+          {/* Left: brand + nav */}
+          <div className="flex items-center gap-3 md:gap-4">
+            <HamburgerMenu />
+            <Link href="/" className="text-xl font-bold tracking-tight">
+              FALU_VIN
             </Link>
+            <NavMenu />
+          </div>
 
+          {/* Center: search (desktop) */}
+          <div className="hidden md:block w-full max-w-md">
             <SearchInput />
           </div>
 
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <nav>
-              <Link
-                prefetch={false}
-                href="/my-courses"
-                className="flex space-x-2 items-center text-sm font-medium text-muted-foreground hover:text-foreground transition-colors md:border md:border-border md:rounded-md md:px-4 md:py-2"
+          {/* Right: auth + mobile search */}
+          <div className="flex items-center gap-2 md:gap-3">
+            {/* Mobile search trigger */}
+            {/* <div className="md:hidden">
+              <button
+                type="button"
+                aria-label="Search"
+                className="p-2 rounded-md hover:bg-muted"
               >
-                <BookMarkedIcon className="h-4 w-4" />
-                <span className="hidden md:block">My Courses</span>
-              </Link>
-            </nav> */}
-
-            {/* <DarkModeToggle /> */}
-
-            {/* <SignedIn>
-              <UserButton />
-            </SignedIn>
+                <SearchIcon className="h-5 w-5" />
+              </button>
+            </div> */}
 
             <SignedOut>
-              <SignInButton mode="modal">
-                <Button variant="outline" size="default">
-                  Sign In
+              <SignInButton mode="modal" >
+                <Button variant="link" className="hidden md:inline-flex">
+                  Log in
                 </Button>
               </SignInButton>
-            </SignedOut> */}
-          {/* </div> */}
 
-          <HamburgerMenu />
+              <SignUpButton mode="modal" >
+                <Button
+                  variant="outline"
+                  className="hidden md:inline-flex border-purple-400 hover:bg-purple-400/20"
+                >
+                  Join for free
+                </Button>
+              </SignUpButton>
+            </SignedOut>
 
-          <Link href='/' className="text-xl font-bold">
-          FALU_VIN
-          </Link>
-
-          <SearchIcon />
+            <SignedIn>
+              <UserButton/>
+            </SignedIn>
+          </div>
         </div>
       </div>
     </header>
