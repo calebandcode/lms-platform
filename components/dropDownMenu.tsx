@@ -55,7 +55,7 @@ export function NavMenu() {
       <NavigationMenuList>
        
         <NavigationMenuItem suppressHydrationWarning>
-          <NavigationMenuTrigger suppressHydrationWarning className="border-purple-400 hidden md:block">Explore</NavigationMenuTrigger>
+          <NavigationMenuTrigger suppressHydrationWarning className="border-purple-400 hidden">Explore</NavigationMenuTrigger>
           <NavigationMenuContent>
             <ul className="grid w-[400px] gap-2 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
               {components.map((component) => (
