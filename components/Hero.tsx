@@ -27,7 +27,7 @@ export default function Hero({
 }: HeroProps) {
   return (
     <section
-      className={`relative w-full my-12 md:my-16 h-[42vh] md:h-[48vh] overflow-hidden rounded-2xl ${className} pt-8`}
+      className={`relative w-full my-12 md:my-16 h-[42vh] md:h-[48vh] overflow-hidden rounded-2xl ${className} pt-10`}
       aria-label="Hero"
     >
       {/* Optional background image */}
