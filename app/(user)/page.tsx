@@ -5,7 +5,7 @@ import type { ComponentProps } from "react";
 import SkillsFinder from "@/components/skillFinder";
 import { ValueProps } from "@/components/valueProps";
 import Footer from "@/components/Footer";
-import FaqSection from "@/components/faqSection";
+// import FaqSection from "@/components/faqSection";
 
 
 export const dynamic = "force-static";
@@ -56,7 +56,7 @@ export default async function Home() {
 
             <ValueProps />
        
-<FaqSection />
+{/* <FaqSection /> */}
       <Footer />
     </div>
   );
