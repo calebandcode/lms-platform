@@ -11,7 +11,7 @@ type HeroProps = {
   primaryCta?: { label: string; href: string };
   /** Optional secondary CTA button */
   secondaryCta?: { label: string; href: string } | null;
-  /** Optional background image URL */
+  /**  background image URL */
   backgroundUrl?: string;
   className?: string;
 };
@@ -21,7 +21,6 @@ export default function Hero({
   title = "Achieve your career goals with Falu_Vin Tech.",
   subtitle = "Subscribe to build job-ready skills from world-class Tutors.",
   primaryCta = { label: "Start Learning", href: "/courses" },
-  secondaryCta = { label: "Explore Catalog", href: "/courses" },
   backgroundUrl,
   className = "",
 }: HeroProps) {
@@ -30,7 +29,7 @@ export default function Hero({
       className={`relative w-full my-12 md:my-16 h-[42vh] md:h-[48vh] overflow-hidden rounded-2xl ${className} pt-10`}
       aria-label="Hero"
     >
-      {/* Optional background image */}
+      {/*  background image */}
       {backgroundUrl && (
         <div className="absolute inset-0 -z-10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -90,16 +89,6 @@ export default function Hero({
                   </Button>
                 )}
 
-                {secondaryCta && (
-                  <Button
-                    asChild
-                    variant="outline"
-                    className="px-6 py-5 md:px-7 md:py-6 rounded-lg bg-background/60 backdrop-blur
-                    hover:bg-background/80"
-                  >
-                    <Link href={secondaryCta.href}>{secondaryCta.label}</Link>
-                  </Button>
-                )}
               </div>
             </div>
           </div>
