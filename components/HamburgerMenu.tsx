@@ -11,6 +11,9 @@ import { MenuIcon} from "lucide-react";
 
 
 import React from 'react'
+import { SignInButton } from "@clerk/nextjs";
+import { Button } from "./ui/button";
+import { SignedIn, SignedOut, SignUpButton, UserButton } from "@clerk/clerk-react";
 
 const HamburgerMenu = () => {
   return (
@@ -18,10 +21,27 @@ const HamburgerMenu = () => {
   <SheetTrigger className="md:hidden"><MenuIcon /></SheetTrigger>
   <SheetContent>
     <SheetHeader>
-      <SheetTitle>Are you absolutely sure?</SheetTitle>
+      <SheetTitle>  <SignedIn>
+                     <UserButton/>
+                   </SignedIn></SheetTitle>
       <SheetDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
+         <SignedOut>
+                     <SignInButton mode="modal"  >
+                       <Button variant="link" className="hidden md:inline-flex">
+                         Log in
+                       </Button>
+                     </SignInButton>
+       
+                     <SignUpButton mode="modal" signInForceRedirectUrl='/onboarding' >
+                       <Button
+                         variant="outline"
+                         className="hidden md:inline-flex border-purple-400 hover:bg-purple-400/20"
+                       >
+                         Join for free
+                       </Button>
+                     </SignUpButton>
+                   </SignedOut>
+       
       </SheetDescription>
     </SheetHeader>
   </SheetContent>
