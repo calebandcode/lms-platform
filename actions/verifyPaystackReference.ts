@@ -1,22 +1,23 @@
 "use server";
 
-export const runtime = "nodejs";
-
 import { auth } from "@clerk/nextjs/server";
 import { getStudentByClerkId } from "@/sanity/lib/student/getStudentByClerkId";
 import { createEnrollment } from "@/sanity/lib/student/createEnrollment";
 
-const VERIFY_URL = "https://api.paystack.co/transaction/verify/";
-
 export async function verifyPaystackReference(reference: string) {
   if (!reference) throw new Error("Missing reference");
+
   const key = process.env.PAYSTACK_SECRET_KEY?.trim();
   if (!key) throw new Error("Missing PAYSTACK_SECRET_KEY");
 
-  const res = await fetch(VERIFY_URL + encodeURIComponent(reference), {
-    headers: { Authorization: `Bearer ${key}` },
-    cache: "no-store",
-  });
+  const res = await fetch(
+    `https://api.paystack.co/transaction/verify/${encodeURIComponent(reference)}`,
+    {
+      headers: { Authorization: `Bearer ${key}` },
+      cache: "no-store",
+    }
+  );
+
   const json = await res.json();
   if (!json?.status) throw new Error(json?.message || "Verification failed");
 
@@ -26,22 +27,21 @@ export async function verifyPaystackReference(reference: string) {
     reference: string;
     metadata?: { courseId?: string; userId?: string };
   };
+
   if (data.status !== "success") throw new Error("Payment not successful");
 
   const courseId = data.metadata?.courseId;
   const userId = data.metadata?.userId;
-  if (!courseId || !userId) throw new Error("Missing metadata from Paystack");
+  if (!courseId || !userId) throw new Error("Missing metadata");
 
-  // (optional) make sure current user matches metadata
+  // Optional: ensure the current signed-in user matches the metadata
   const { userId: current } = await auth();
-  if (current && current !== userId) {
-    // throw new Error("User mismatch");
-  }
+  // if (current && current !== userId) throw new Error("User mismatch");
 
   const student = await getStudentByClerkId(userId);
   if (!student.data) throw new Error("Student not found");
 
-  // idempotent create (see step 3)
+  // Idempotent create (use Paystack reference as paymentId)
   await createEnrollment({
     studentId: student.data._id,
     courseId,
