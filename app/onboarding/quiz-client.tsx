@@ -1,121 +1,88 @@
-// app/onboarding/quiz-client.tsx
 "use client";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { saveOnboardingResult } from "@/app/actions/saveOnboardingResult";
+import { saveOnboardingResult, type SaveOnboardingResult } from "@/app/actions/saveOnboardingResult";
 
 type Letter = "A" | "B" | "C" | "D" | "E";
 
-// Your exact 10 questions (A–E) from the doc:
 const QUESTIONS: { q: string; options: { letter: Letter; label: string }[] }[] = [
-  {
-    q: "Which activity sounds most exciting to you?",
-    options: [
-      { letter: "A", label: "Creating digital art or brand visuals" },
-      { letter: "B", label: "Building websites or apps" },
-      { letter: "C", label: "Making sense of numbers and trends" },
-      { letter: "D", label: "Promoting businesses and tracking social media performance" },
-      { letter: "E", label: "Detecting and stopping online threats" },
-    ],
-  },
-  {
-    q: "What kind of tasks do you enjoy the most?",
-    options: [
-      { letter: "A", label: "Drawing, editing photos, or designing flyers" },
-      { letter: "B", label: "Writing or tweaking code" },
-      { letter: "C", label: "Working with charts, spreadsheets, or research" },
-      { letter: "D", label: "Posting content, engaging followers, or running ads" },
-      { letter: "E", label: "Investigating problems and solving puzzles" },
-    ],
-  },
-  {
-    q: "If you had to learn one tool today, it would be:",
-    options: [
-      { letter: "A", label: "Canva or Adobe Illustrator" },
-      { letter: "B", label: "HTML, CSS, or JavaScript" },
-      { letter: "C", label: "Excel or SQL" },
-      { letter: "D", label: "Facebook Ads Manager or SEO tools" },
-      { letter: "E", label: "Network scanners or password testers" },
-    ],
-  },
-  {
-    q: "How do you usually solve problems?",
-    options: [
-      { letter: "A", label: "Visually – I sketch or design a concept" },
-      { letter: "B", label: "Step-by-step – I break it into smaller pieces" },
-      { letter: "C", label: "With data – I look at facts and patterns" },
-      { letter: "D", label: "By asking others and researching what works" },
-      { letter: "E", label: "I try to find the root cause and prevent it" },
-    ],
-  },
-  {
-    q: "Which of these would you prefer as a career?",
-    options: [
-      { letter: "A", label: "Creative Designer or Brand Visual Specialist" },
-      { letter: "B", label: "Front-end or Back-end Developer" },
-      { letter: "C", label: "Data Analyst or Business Intelligence Specialist" },
-      { letter: "D", label: "Social Media Manager or Digital Strategist" },
-      { letter: "E", label: "Cybersecurity Analyst or Ethical Hacker" },
-    ],
-  },
-  {
-    q: "What excites you about tech?",
-    options: [
-      { letter: "A", label: "The ability to create stunning visuals" },
-      { letter: "B", label: "The power to build tools people can use" },
-      { letter: "C", label: "Discovering hidden insights from raw data" },
-      { letter: "D", label: "Reaching audiences and growing brands online" },
-      { letter: "E", label: "Protecting systems and information from threats" },
-    ],
-  },
-  {
-    q: "How would your friends describe you?",
-    options: [
-      { letter: "A", label: "Artistic and expressive" },
-      { letter: "B", label: "Analytical and tech-savvy" },
-      { letter: "C", label: "Observant and data-driven" },
-      { letter: "D", label: "Outgoing and persuasive" },
-      { letter: "E", label: "Smart and security-conscious" },
-    ],
-  },
-  {
-    q: "What would you love to create?",
-    options: [
-      { letter: "A", label: "A logo or flyer for a new brand" },
-      { letter: "B", label: "A website for a business or blog" },
-      { letter: "C", label: "A report showing business insights" },
-      { letter: "D", label: "A campaign to grow a brand online" },
-      { letter: "E", label: "A system that protects users from online attacks" },
-    ],
-  },
-  {
-    q: "Which work environment do you prefer?",
-    options: [
-      { letter: "A", label: "Creative and visual tasks" },
-      { letter: "B", label: "Building or coding challenges" },
-      { letter: "C", label: "Quiet, focused, and analytical" },
-      { letter: "D", label: "Fast-paced and engaging with trends" },
-      { letter: "E", label: "Investigative and detail-oriented" },
-    ],
-  },
-  {
-    q: "When learning something new, you prefer:",
-    options: [
-      { letter: "A", label: "Visual examples and practice" },
-      { letter: "B", label: "Trying out code and debugging" },
-      { letter: "C", label: "Real-life data and problem-solving" },
-      { letter: "D", label: "Watching tutorials and applying tips" },
-      { letter: "E", label: "Exploring how things break and how to fix them" },
-    ],
-  },
+  { q: "Which activity sounds most exciting to you?", options: [
+    { letter: "A", label: "Creating digital art or brand visuals" },
+    { letter: "B", label: "Building websites or apps" },
+    { letter: "C", label: "Making sense of numbers and trends" },
+    { letter: "D", label: "Promoting businesses and tracking social media performance" },
+    { letter: "E", label: "Detecting and stopping online threats" },
+  ]},
+  { q: "What kind of tasks do you enjoy the most?", options: [
+    { letter: "A", label: "Designing flyers or editing photos" },
+    { letter: "B", label: "Writing or tweaking code" },
+    { letter: "C", label: "Working with charts/spreadsheets" },
+    { letter: "D", label: "Posting content or running ads" },
+    { letter: "E", label: "Investigating problems and solving puzzles" },
+  ]},
+  { q: "If you had to learn one tool today, it would be:", options: [
+    { letter: "A", label: "Canva or Illustrator" },
+    { letter: "B", label: "HTML/CSS/JavaScript" },
+    { letter: "C", label: "Excel or SQL" },
+    { letter: "D", label: "Ads Manager or SEO tools" },
+    { letter: "E", label: "Network scanners or password testers" },
+  ]},
+  { q: "How do you usually solve problems?", options: [
+    { letter: "A", label: "Visually – I sketch or design a concept" },
+    { letter: "B", label: "Step-by-step – break into smaller pieces" },
+    { letter: "C", label: "With data – look at facts and patterns" },
+    { letter: "D", label: "Ask others and research what works" },
+    { letter: "E", label: "Find the root cause and prevent it" },
+  ]},
+  { q: "Which of these would you prefer as a career?", options: [
+    { letter: "A", label: "Creative Designer" },
+    { letter: "B", label: "Front-end / Back-end Developer" },
+    { letter: "C", label: "Data Analyst / BI Specialist" },
+    { letter: "D", label: "Digital Marketer / Strategist" },
+    { letter: "E", label: "Cybersecurity Analyst / Ethical Hacker" },
+  ]},
+  { q: "What excites you about tech?", options: [
+    { letter: "A", label: "Creating stunning visuals" },
+    { letter: "B", label: "Building tools people use" },
+    { letter: "C", label: "Finding insights in data" },
+    { letter: "D", label: "Reaching audiences and growing brands" },
+    { letter: "E", label: "Protecting systems and information" },
+  ]},
+  { q: "How would your friends describe you?", options: [
+    { letter: "A", label: "Artistic and expressive" },
+    { letter: "B", label: "Analytical and tech-savvy" },
+    { letter: "C", label: "Observant and data-driven" },
+    { letter: "D", label: "Outgoing and persuasive" },
+    { letter: "E", label: "Security-conscious" },
+  ]},
+  { q: "What would you love to create?", options: [
+    { letter: "A", label: "A logo or flyer for a new brand" },
+    { letter: "B", label: "A website for a business or blog" },
+    { letter: "C", label: "A report showing business insights" },
+    { letter: "D", label: "A campaign to grow a brand online" },
+    { letter: "E", label: "A system that protects users" },
+  ]},
+  { q: "Which work environment do you prefer?", options: [
+    { letter: "A", label: "Creative and visual tasks" },
+    { letter: "B", label: "Building or coding challenges" },
+    { letter: "C", label: "Quiet, focused, and analytical" },
+    { letter: "D", label: "Fast-paced with trends" },
+    { letter: "E", label: "Investigative and detail-oriented" },
+  ]},
+  { q: "When learning something new, you prefer:", options: [
+    { letter: "A", label: "Visual examples and practice" },
+    { letter: "B", label: "Trying code and debugging" },
+    { letter: "C", label: "Real-life data and problem-solving" },
+    { letter: "D", label: "Tutorials and applying tips" },
+    { letter: "E", label: "Exploring how things break and fixing them" },
+  ]},
 ];
 
 export default function QuizClient() {
-  const [answers, setAnswers] = useState<Letter[]>(
-    Array(QUESTIONS.length).fill(undefined) as Letter[]
-  );
+  const [answers, setAnswers] = useState<Letter[]>(Array(QUESTIONS.length).fill(undefined) as Letter[]);
   const [isPending, startTransition] = useTransition();
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const select = (i: number, letter: Letter) => {
@@ -124,13 +91,19 @@ export default function QuizClient() {
       next[i] = letter;
       return next;
     });
+    setError(null);
   };
 
   const allDone = answers.every(Boolean);
 
   const submit = () =>
     startTransition(async () => {
-      const res = await saveOnboardingResult(answers);
+      setError(null);
+      const res: SaveOnboardingResult = await saveOnboardingResult(answers);
+      if (!res.ok) {
+        setError(res.message || "Could not save your answers. Please try again.");
+        return;
+      }
       if (res.recommendedCourse?.slug) {
         router.push(`/courses/${res.recommendedCourse.slug}?recommended=1`);
       } else {
@@ -163,6 +136,12 @@ export default function QuizClient() {
           </div>
         </div>
       ))}
+
+      {error && (
+        <div className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+          {error}
+        </div>
+      )}
 
       <button
         disabled={!allDone || isPending}

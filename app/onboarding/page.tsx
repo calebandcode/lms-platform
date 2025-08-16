@@ -1,4 +1,3 @@
-// app/onboarding/page.tsx
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
 import QuizClient from "./quiz-client";
@@ -6,6 +5,7 @@ import QuizClient from "./quiz-client";
 export default async function OnboardingPage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");
+
   return (
     <div className="container mx-auto px-4 py-10 max-w-3xl">
       <h1 className="text-3xl font-bold">Let’s personalize your learning</h1>
