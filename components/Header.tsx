@@ -52,13 +52,13 @@ export default function Header() {
             </div> */}
 
             <SignedOut>
-              <SignInButton mode="modal" >
+              <SignInButton mode="modal"  >
                 <Button variant="link" className="hidden md:inline-flex">
                   Log in
                 </Button>
               </SignInButton>
 
-              <SignUpButton mode="modal" >
+              <SignUpButton mode="modal" signInForceRedirectUrl='/onboarding' >
                 <Button
                   variant="outline"
                   className="hidden md:inline-flex border-purple-400 hover:bg-purple-400/20"
