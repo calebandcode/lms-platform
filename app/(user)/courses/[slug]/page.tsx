@@ -5,6 +5,7 @@ import { ArrowLeft, BookOpen } from "lucide-react";
 import EnrollButton from "@/components/EnrollButton";
 import getCourseBySlug from "@/sanity/lib/courses/getCourseBySlug";
 import { isEnrolledInCourse } from "@/sanity/lib/student/isEnrolledInCourse";
+import PaystackVerifier from "@/components/PaystackVerifier";
 import { auth } from "@clerk/nextjs/server";
 
 // Minimal Sanity image type (avoids `any`)
@@ -67,6 +68,7 @@ export default async function CoursePage(props: CoursePageProps) {
 
   return (
     <div className="min-h-screen bg-background">
+      <PaystackVerifier />
       {/* Hero Section */}
       <div className="relative h-[60vh] w-full">
         {course.image && (
